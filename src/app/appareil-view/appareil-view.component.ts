@@ -19,6 +19,9 @@ export class AppareilViewComponent implements OnInit {
     setTimeout(    () => {   this.isAuth = true;  }, 4000  );
   }
   ngOnInit(){
+    this.appareilService.getAppareilsFromServer();
+    this.appareilService.saveAppareilsToServer();
+
     this.appareilSubscription = this.appareilService.appareilsSubject.subscribe(
       (appareils : any[]) => {
         this.appareils = appareils;
@@ -44,5 +47,11 @@ export class AppareilViewComponent implements OnInit {
    ngOnDestroy(){
     this.appareilSubscription?.unsubscribe();
    }
+   onSave(){
+    this.appareilService.saveAppareilsToServer();
+   }
+  onFetch(){
+    this.appareilService.getAppareilsFromServer();
+  }
 
 }

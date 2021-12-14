@@ -1,30 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
+import {HttpClient} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppareilService {
 
-  constructor() { }
+  constructor(private httpClient: HttpClient) { }
   appareilsSubject = new Subject<any[]>();
-private  appareils = [
-    {
-      id:1,
-      name: 'Machine a laver',
-      status: 'éteint'
-    },
-    {
-      id:2,
-      name: 'Frigo',
-      status: 'allumé'
-    },
-    {
-      id:3,
-      name: 'Ordinateur',
-      status: 'éteint'
-    }
-  ]
+private  appareils : any;
 
         emitAppareilSubject(){
             this.appareilsSubject.next(this.appareils.slice());
@@ -54,7 +39,7 @@ private  appareils = [
 
         getAppareilById(id: number){
           const appareil = this.appareils.find(
-            (s) => {
+            (s: { id: number; }) => {
               return s.id === id;
             }
           );
@@ -72,5 +57,30 @@ private  appareils = [
           appareilObject.id= this.appareils[(this.appareils.length-1)].id +1;
           this.appareils.push(appareilObject);
           this.emitAppareilSubject();
+        }
+
+        saveAppareilsToServer(){
+            this.httpClient.put('https://projetmichelle-default-rtdb.firebaseio.com/appareils.json', this.appareils)
+              .subscribe(
+                () => {
+                  console.log('Enregistrement terminé !');
+                },
+                (error )=>{
+                  console.log('Erreur ! : ' + error);
+                }
+              );
+        }
+
+        getAppareilsFromServer(){
+          this.httpClient.get('https://projetmichelle-default-rtdb.firebaseio.com/appareils.json')
+            .subscribe(
+              (response) => {
+                this.appareils = response;
+                this.emitAppareilSubject();
+              },
+              (error)=> {
+                console.log('Erreur ! : ' + error);
+              }
+            )
         }
 }
